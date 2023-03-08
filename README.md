@@ -32,9 +32,9 @@ It was decided that a full-on literature review to accompany this may be overkil
 
 ## **ARCHIVAL**
 Criteria for marking
-• [15 marks] Understanding and exploration of both the problem and the data.
-• [10 marks] Thoroughness and rigour, e.g. clear mathematical description of models.
-• [25 marks] Clear exposition of the steps you took in model fitting and exposition of a final model.
-• [20 marks] Clear presentation and interpretation of results.
-• [10 marks] Critical review of the analysis.
-• [20 marks] Clarity and conciseness in writing and tidy presentation of R code and associated plots.
+* [15 marks] Understanding and exploration of both the problem and the data.
+*[10 marks] Thoroughness and rigour, e.g. clear mathematical description of models.
+* [25 marks] Clear exposition of the steps you took in model fitting and exposition of a final model.
+* [20 marks] Clear presentation and interpretation of results.
+* [10 marks] Critical review of the analysis.
+* [20 marks] Clarity and conciseness in writing and tidy presentation of R code and associated plots.
