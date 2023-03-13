@@ -7,6 +7,19 @@ This is the repository for the Group Project of UoE MTHM506 Statistical Data Mod
 **Action Items**:
 1. Souradeep to share Bayesian Analysis MTHM308 model solution as a reference for how to structure a mathematical modeling paper. Please check the github link <https://github.com/sourasen1011/MTHM506_Group_2_Project>
 
+
+#### 13.3.23
+having trouble with maps
+lots of covariates are loosely correlated
+some missing data - will be looked
+
+
+socio economic vars included
+neg binom is probably the best
+knots very high number used for smooth terms used
+
+Next meeting: Thursday 16th Mar, 2023 - ~3:30 PM
+
 **Project Approach:**
 
 1. **Problem Statement:** Clear description of what is expected for the assignment and how the data will inform our decisions.
