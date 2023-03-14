@@ -1,0 +1,52 @@
+---
+title: "EDA of TB in Brazil form 2012 to 2014"
+author: "Joshua Robert"
+output: "pdf_document"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set (echo = TRUE)
+library(dplyr)
+library(DataExplorer)
+library(dlookr)
+library(GGally)
+library(sp)
+TBData = load("TBdata.RData")
+tbs = arrange(TBdata, TB)
+```
+## General overview
+The TB data from Brazil includes 1,671 entries or samples with 14 columns of numeric data types that specify the characteristics of each sample. The columns are self-explanatory because they are called `r names(tbs)`. TB stands for tuberculosis, whereas lon and lat stand for longitude and latitude, respectively.The dataset has no missing values in the technical sense but it contains some abnormalities, which increases the amount of pre-processing needed. Despite being a factor variable, region is stored as a continuous variable; nonetheless, changing the variable depends on the task at hand. Moreover, the collection includes coordinates that describe the precise geo-spatial locations of the micro-regions listed in the column.
+
+## Deep look into
+
+An in-depth analysis of the datasets reveals that the mean and median values for the indigenous population are very low, but the maximum value is 50, which suggests that there are individual areas where the indigenous population is concentrated, and that these areas may be areas of potential poverty and poor sanitation and should be areas where there are more cases of tuberculosis. The mean and median illiteracy rates are only 14 and 11, respectively, indicating that illiteracy is not widespread. However, the maximum value of 41 suggests that there are specific backward areas with significant populations lacking access to education, which also suggests that the area seems to be poor and also has poor sanitation. There are still some places that are less urbanised, where there may be more occurrences of tuberculosis, but the mean, median, and minimum values for urbanisation are 70 and 22, respectively, suggesting that most areas are highly urbanised. Most locations, based on the population density data, can fit one person in a room, but the highest value of 1.6 highlights the existence of some places with very high population densities, which sharply raise the rate of TB transmission. The distribution of the poverty data suggests that there are different levels of poverty in each district, with only a very limited number of districts where poverty is not a significant issue. Although the general results on inadequate sanitation are low, the maximum score of 58 indicates that some districts have very poor sanitation and a substantial risk of disease. Although average unemployment rates are low, a maximum value of 20 indicates that some isolated regions may experience severe economic hardship, protracted social unrest, and potentially significant rates of morbidity. With a minimum value of 0, notification timeliness data has a fairly wide range.
+
+In general, data from the actual world tend to follow a normal distribution, however some of the columns indicate otherwise. Timeliness, Unemployment, and Urbanization are approximations of a normal distribution with few extremes, whilst the remainder are multimodal normal distributions. This suggests that employing semi-parametric or non-parametric models to demonstrate the relationship between the target and predictors would be advantageous. The target variable in this study is risk, which is defined as `TB/Population`,' whereas the remaining variables are possible predictors. As demonstrated in the table below, the majority of features in the dataset exhibit some amount of connection. As some features are correlated, basic regression cannot be used because it would yield false results; rather, models that account for the connection can be used. It is vital to note that some characteristics are anticipated to have positive correlations (tuberculosis versus population, density versus poverty), and vice versa. Specifically, population density, poverty, health conditions, unemployment, and notification timeliness are likely high due to the high population density, the low economic share per capita, the high poverty rate, and the high jobless rate.
+
+
+# pls ignore below
+# ```{r general, echo=FALSE, message=FALSE}
+# plot_intro(tbs)
+# introduce(tbs)
+# ```
+
+## Data details
+
+
+
+
+
+
+# ```{r qq, echo=FALSE, message=FALSE}
+# plot_qq(tbs)
+# plot_density(tbs)
+# ```
+
+
+
+# ```{r corr, echo=FALSE, message=FALSE}
+# new_data = select(tbs, -c(lon, lat))
+# plot_correlate(new_data, method = "kendall",)
+# ```
+
+
