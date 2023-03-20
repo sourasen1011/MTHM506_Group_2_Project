@@ -1,0 +1,99 @@
+---
+title: "Group Project Report"
+output:
+  pdf_document: default
+  html_document: default
+date: "2023-03-19"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# load('/home/enam_2004/Downloads/datasets_project1.RData')
+load('datasets_project.RData')
+```
+
+## The Model
+
+As the target variable is the count of TB cases, the basic form the model which is designed to explain the ratio of TB cases per capita has the form
+$$TB_{i, t} \sim Pois(\eta_{i, t})$$
+$$\log(\eta_{i, t}) = \log(Population_{i, t}) + \sum_{j = 1}^{8} f_{j}(x_{i,t, j})$$
+where $x_{i,t,j}$ for $j \in {1,...,8}$ is the value one of the socio-economic variables mentioned in the task-description for year t. Having this model the model coefficients are explaining the relation between the explaining variables and the ratio of TB cases per capita:
+
+
+Looking at the distribution of the residuals of the model one sees that the Poisson model, which has a fixed dispersion parameter is clearly overdispersed. So the model distribution is changed to Negative Binomial with the same parameterization except for the feature that the count of TB cases is now Negative Binomial distributed with mean $\eta_{i}$ as described above.
+
+Given the ground model we investigate whether all given socio-economic variables are needed to explain the ratio of TB cases per capita or whether there is a less complex model. There for we try to drop the variables with the highest p-values for the hypothesis test $\beta_{j} = 0$ and perform an LRT to see whether the reduced model is as good as the more complex model. Leaving one variable out is repeated until the reduced model is significantly worse than more complex model. Dropping the Illiteracy variable does not make the model significantly worse. Next, the Poverty variable which has the 2nd lowest p-value for $\beta_{j} = 0$ in the initial model is dropped aditionally, but then the null hypothesis of the LRT that this model is as good as the model which only leaves out Illiteracy can be rejected at 5%-level. So in the following we use a model with all of the socio-economic variables except for Illiteracy.
+
+Further extensions to the model can be reached by including 1) time, 2) space, or 3) both. 
+
+The temporal model changes the expression for $\eta_{i}$ as follows:
+
+$$\log(\eta_{i}) = \log(Population_{i,t}) + \beta_0 + \sum_{t = 2012}^{2014}\sum_{j = 1}^{7} \beta_{t,j}f_{t,j}(x_{i,t,j})$$
+
+where $x_{i,t,j}$ is the value of the variable index by $j$ for year $t$. For this model the AIC does not drop compared to the model which does not consider time.
+
+The spatial model adds a smoothed term which is function of the longitude and the latitude. A bivariate function is used because it makes sense to assume that there are more cases at certain locations (defined by the interaction between latitude and longitude) than others, rather than that there are more cases at locations with a certain longitude for any latitude, or the other way round.
+$$\log(\eta_{i}) = \log(Population_{i,t}) + \beta_0 + \sum_{j = 1}^{7} \beta_{j}f_{j}(x_{i,t,j}) + \beta_{8}f_{8}(lon_{i,t}, lat_{i,t})$$
+Furthermore, there is a model which includes the term for the location and estimates a functional relation for each year and each explaining variable. The AIC of this model does not drop compared to the spatial model, so the spatial model is - given that it is simpler - the model which explains the ratio of TB cases per capita best.
+$$\log(\eta_{i}) = \log(Population_{i,t}) + \beta_0 + \sum_{t = 2012}^{2014}\left(\sum_{j = 1}^{7} \beta_{t,j}f_{t,j}(x_{i,t,j}) + \beta_{s}f_{s}(lon_{i,t}, lat_{i,t})\right)$$
+
+Let us know have a look at the fit of the spatial model: It fits well even though the largest residuals are higher than expected from the model distribution. For districts that have a high number of cases the predictor does not seem as accurate as it should. But the highest residuals do not arise when the ratio of TB cases per capita is extraordinarily high, but rather when the absolute number of TB cases is high (see residuals vs. response). The variance of the model stil seems too low for those values given that there are some predicted values in that high segment of response values (absolut number of TB cases) where the prediction for the response value is lower than the actual value, and some where the prediction of the actual value is higher than the actual value.
+
+
+## Code
+
+
+```{r}
+library (mgcv)
+
+
+par(mfrow = c(2,2))
+#fit poisson model with socio-economic variables
+model_poisson <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) +  s(Illiteracy) +  s(Urbanisation) + s(Density) + s(Poverty) + s(Poor_Sanitation) + s(Unemployment) + s(Timeliness), data = TBdata, family = poisson(link = 'log'))
+summary(model_poisson)
+model_poisson$aic
+par(mfrow = c(2,2),pch = 20)
+gam.check(model_poisson)
+
+#fit negative binomial model with  socioeconomic
+model_nb <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) +  s(Illiteracy) + s(Urbanisation) + s(Density) + s(Poverty) + s(Poor_Sanitation) + s(Unemployment) + s(Timeliness), data = TBdata, family = nb(link = 'log'))
+summary(model_nb)
+model_nb$aic
+#drop Illiteracy
+model_nb_2 <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) +  s(Urbanisation) + s(Density) + s(Poverty) + s(Poor_Sanitation) + s(Unemployment) + s(Timeliness), data = TBdata, family = nb(link = 'log'))
+
+
+#LRT
+anova.gam(model_nb_2, model_nb, test = 'LRT')
+
+#Null hypothesis not rejected -> drop poverty
+model_nb_3 <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) +  s(Urbanisation) + s(Density) + s(Poor_Sanitation) + s(Unemployment) + s(Timeliness), data = TBdata, family = nb(link = 'log'))
+#LRT
+anova.gam(model_nb_3, model_nb_2, test = 'LRT')
+
+model_nb_final <- model_nb_2
+summary(model_nb_final)
+gam.check(model_nb_final)
+
+#temporal model
+model_nb_time <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous, by = Year) + s(Urbanisation, by = Year) + s(Density, by = Year) + s(Poverty, by = Year) + s(Poor_Sanitation, by = Year) + s(Unemployment, by = Year) + s(Timeliness, by = Year), data = TBdata, family = nb(link = 'log'))
+summary(model_nb)
+model_nb$aic
+
+#spatial model
+model_nb_space <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) +  s(Illiteracy) + s(Urbanisation) + s(Density) + s(Poverty) + s(Poor_Sanitation) + s(Unemployment) + s(Timeliness) + s(lon, lat), data = TBdata, family = nb(link = 'log'))
+summary(model_nb_space)
+model_nb_space$aic
+gam.check(model_nb_space)
+anova.gam(model_nb_space, model_nb_final)
+
+#spatio-temporal model
+model_nb_time_and_space <- gam(formula = TB ~ offset(log(Population)) + s(Urbanisation, by = Year) + s(Density, by = Year) + s(Poverty, by = Year) + s(Poor_Sanitation, by = Year) + s(Timeliness, by = Year) + s(Unemployment, by = Year) + s(lon,lat, by = Year), data = TBdata, family = nb(link = 'log'))
+summary(model_nb_time_and_space)
+model_nb_time_and_space$aic
+gam.check(model_nb_time_and_space)
+
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
