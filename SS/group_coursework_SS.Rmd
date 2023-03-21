@@ -34,7 +34,7 @@ library(reshape2) # only required for melt in corr plot
 library(car) # only required for VIF
 
 # Load Data
-load('datasets_project.RData')
+load("C:/Users/soura/Documents/COMM511/group_coursework/datasets_project.RData")
 
 # Investigate correlation
 ### Resource -> http://www.sthda.com/english/wiki/ggplot2-quick-
