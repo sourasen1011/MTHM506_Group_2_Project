@@ -165,12 +165,14 @@ gam.check(model5,pch=20)
 ################################################################################################
 
 # POISSON - Overdispersion noted
-model_smooth_1 <- gam(TB ~  offset(log(Population)) + s(Indigenous) + s(Illiteracy) + s(Urbanisation) + s(Density) + s(Poverty) + s(Poor_Sanitation) + s(Unemployment) + s(Timeliness) + s(Year) + s(Region) + s(lon) + s(lat) , data= TBdata , family = 'nb'(link='log'))
+model_smooth_1 <- gam(TB ~  offset(log(Population)) + s(Indigenous) + s(Illiteracy) + s(Urbanisation) + s(Density) + s(Poverty) + s(Poor_Sanitation) + s(Unemployment) + s(Timeliness) + s(Region) + s(lon) + s(lat) , data= TBdata , family = 'nb'(link='log'))
 
 # 2x2 plot for the residuals
 par(mfrow=c(2,2))
 # Runing gam.check on our original model
 gam.check(model_smooth_1,pch=20)
+
+
 # reset graphics window
 par(mfrow=c(1,1))
 

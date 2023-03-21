@@ -1,0 +1,218 @@
+---
+title: "MTHM506 Group Project Report"
+author: 'Group 2'
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+library(formatR)
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=4, fig.height=4)
+knitr::opts_chunk$set(fig.align='center')
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+options(warn=-1)
+```
+
+The following is an exploration of tuberculosis (TB) data originating from Brazil, using Generalized
+Additive Models (GAMs). Brazil is divided into 557 administrative microregions and the available data
+comprises of counts of TB cases in each microregion for each of the years 2012-2014.
+
+
+# Appendix
+```{r message = FALSE}
+# Import Libraries
+library(mgcv) # required for GAM 
+library(tidyverse) 
+library(ggplot2) # required for plotting
+library(dplyr) # required for filtering dataset
+library(fields) # required for maps
+library(maps) # required for maps
+library(reshape2) # only required for melt in corr plot
+library(car) # only required for VIF
+
+# Load Data
+load('datasets_project.RData')
+
+# Investigate correlation
+### Resource -> http://www.sthda.com/english/wiki/ggplot2-quick-
+### correlation-matrix-heatmap-r-software-and-data-visualization
+cormat <- cor(TBdata[,c(1,2,3,4,5,6,7,8)])
+# Reorder
+reorder_cormat <- function(cormat){
+  # Use correlation between variables as distance
+  dd <- as.dist((1-cormat)/2)
+  hc <- hclust(dd)
+  cormat <-cormat[hc$order, hc$order]
+}
+
+# Reorder the correlation matrix
+cormat <- reorder_cormat(cormat)
+# Get lower triangular matrix
+cormat[lower.tri(cormat)] <- NA
+
+melted_cormat <- melt(cormat , na.rm = TRUE)
+melted_cormat$value = round(melted_cormat$value, 2)
+
+# Create a ggheatmap
+ggheatmap <- ggplot(melted_cormat, aes(Var2, Var1, fill = value))+
+ geom_tile(color = "white")+
+ scale_fill_gradient2(low = "#1a85d6", high = "#cf3e4f", mid = "white", 
+   midpoint = 0, limit = c(-1,1), space = "Lab", 
+    name="Pearson\nCorrelation") +
+  theme_minimal()+ # minimal theme
+ theme(axis.text.x = element_text(angle = 90, vjust = 1, 
+    size = 12, hjust = 1))+
+ coord_fixed()
+
+# Add correlation coefficients
+ggheatmap +
+geom_text(aes(Var2, Var1, label = value), color = "black", size = 2) +
+theme(
+  axis.text.x = element_text(size = 6),
+  axis.text.y = element_text(size = 6),
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.border = element_blank(),
+  panel.background = element_blank(),
+  axis.ticks = element_blank(),
+  legend.justification = c(1, 0),
+  legend.position = c(0.6, 0.7),
+  legend.direction = "horizontal",
+  legend.text = element_text(size = 6)
+  ) + 
+  guides(fill = guide_colorbar(barwidth = 7, barheight = 1,
+                title.position = "top", title.hjust = 0.5))
+
+#### Illiteracy is highly correlated with Poverty
+#### Carry out a Variance Inflation Test
+model_all <- lm(TB ~ . , data = select(TBdata, 'Indigenous' , 'Illiteracy' , 
+'Urbanisation' , 'Density' , 'Poverty', 'Unemployment' , 'Timeliness' , 'Year' ,
+'TB' , 'Population'))  # with all the independent variables
+
+vif(model_all) # Several variables are highly correlated
+
+model_no_illiteracy <- lm(TB ~ . , data = select(TBdata, 'Indigenous', 
+'Urbanisation' , 'Density' , 'Poverty', 'Unemployment' , 'Timeliness' , 'Year' ,
+'TB' , 'Population'))  # with all the independent variables
+
+vif(model_no_illiteracy) # Poverty and Unemployment still seem highly correlated
+
+model_no_illiteracy_no_poverty <- lm(TB ~ . , data = select(TBdata, 'Indigenous', 
+'Urbanisation' , 'Density', 'Unemployment' , 'Timeliness' , 'Year' ,
+'TB' , 'Population'))  # with all the independent variables
+
+vif(model_no_illiteracy_no_poverty) # almost no variable is highly correlated
+
+## More formal tests are conducted to confirm the dropping of Illiteracy.
+## Check to see if Poverty should be dropped as well
+prelim.model.1 <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) + 
+s(Illiteracy) + s(Urbanisation) + s(Density) + s(Poverty) + s(Poor_Sanitation)
++ s(Unemployment) + s(Timeliness),
+data = TBdata , 
+family = nb(link = 'log')
+)
+# Show summary
+summary(prelim.model.1)
+
+### Only the effect of illiteracy cannot be reliably stated to be non-zero
+prelim.model.2 <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) 
++ s(Urbanisation) + s(Density) + s(Poverty) + s(Poor_Sanitation)
++ s(Unemployment) + s(Timeliness),
+data = TBdata , 
+family = nb(link = 'log')
+)
+# Show summary
+summary(prelim.model.2)
+# Likelihood ratio test
+anova(prelim.model.1 , prelim.model.2 , test = 'F') # p-value is over 0.05
+# The models are statistically indistinguishable
+
+### Only the effect of illiteracy cannot be reliably stated to be non-zero
+prelim.model.3 <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) 
++ s(Urbanisation) + s(Density) + s(Poor_Sanitation) + s(Unemployment) 
++ s(Timeliness),
+data = TBdata , 
+family = nb(link = 'log')
+)
+# Show summary
+summary(prelim.model.3)
+
+# Likelihood ratio test
+anova(prelim.model.2 , prelim.model.3 , test = 'F') # p-value is less than 0.05
+# The models are statistically different. Poverty should not be excluded.
+
+### Model chosen (with social covariates) is the negative binomial without
+### Illiteracy
+summary(prelim.model.2) # Only 44% of the deviance is explained. Adding temporal
+# and spatial covariates may improve this
+par(mfrow=c(2,2))
+gam.check(prelim.model.2)
+par(mfrow = c(1,1))
+
+### Adding spatial covariates
+spatial.model <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) 
++ s(Urbanisation) + s(Density) + s(Poor_Sanitation) + s(Unemployment) 
++ s(Timeliness) + s(lon , lat),
+data = TBdata , 
+family = nb(link = 'log')
+)
+# Check summary
+summary(spatial.model)
+# Check the smooth functions of the covars
+plot(spatial.model)
+par(mfrow=c(2,2))
+gam.check(spatial.model)
+par(mfrow = c(1,1))
+
+### Using separate smoothers
+spatial.model.2 <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) 
++ s(Urbanisation) + s(Density) + s(Poor_Sanitation) + s(Unemployment) 
++ s(Timeliness) + te(lon , lat , k = 20),
+data = TBdata , 
+family = nb(link = 'log')
+)
+# Check summary
+summary(spatial.model.2)
+# Check the smooth functions of the covariates
+plot(spatial.model.2)
+par(mfrow=c(2,2))
+gam.check(spatial.model.2)
+par(mfrow = c(1,1))
+
+TBdata$Year.asFactor <- factor(TBdata$Year)
+
+#### Temporal covariates
+temporal.model <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) 
++ s(Urbanisation) + s(Density) + s(Poor_Sanitation) + s(Unemployment) 
++ s(Timeliness) + Year.asFactor,
+data = TBdata , 
+family = nb(link = 'log')
+)
+# Check summary
+summary(temporal.model) # Temporal alone doesn't add much to explaining the variance
+# Check the smooth functions of the covariates
+plot(temporal.model)
+par(mfrow=c(2,2))
+gam.check(temporal.model)
+par(mfrow = c(1,1))
+
+### Spatio-temporal model
+spatio.temporal.model <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) 
++ s(Urbanisation) + s(Density) + s(Poor_Sanitation) + s(Unemployment) 
++ s(Timeliness) + te(lon , lat , k = 20) + Year.asFactor,
+data = TBdata , 
+family = nb(link = 'log')
+)
+# Check summary
+summary(spatio.temporal.model) # Temporal alone doesn't add much to explaining the variance
+# Check the smooth functions of the covariates
+plot(spatio.temporal.model)
+par(mfrow=c(2,2))
+gam.check(spatio.temporal.model)
+par(mfrow = c(1,1))
+
+```
