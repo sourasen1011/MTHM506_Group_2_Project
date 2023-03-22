@@ -1,0 +1,108 @@
+We want to model the count of cases $TB_i$ by actually modelling $\rho_i$ using
+$$
+\begin{aligned}
+	TB_i \sim Pois(\lambda_i = z_i \rho_i) \ TB_i\  \mathrm{indep.} 
+	\\
+	log(\lambda_i) = log(z_i) + log(\rho_i)
+\end{aligned}
+$$
+where $TB_i$ is the count of TB cases, $z_i$ is the total population. Model $log(\rho_i)$ as
+
+$$
+\begin{aligned}
+	log(\rho_i) = \sum_{j=1}^{8}f_{j}(x_{i,j})
+	\\
+	f(x_i) = \sum_{k=1}^{q}\beta_{k}b_{k}(x_i)
+\end{aligned}
+$$
+where $x_{i,j}$ is the $j$th covariate (out of 8 socio-economic covariates) for the $i$th instance/datum in the dataset and $f(\cdot)$ is a smooth function of said covariate. Hence, the model boils down to
+$$
+\begin{aligned}
+	TB_i \sim Pois(\lambda_i = z_i \rho_i) \ TB_i\  \mathrm{indep.} 
+	\\
+	log(\lambda_i) = log(z_i) +  \sum_{j=1}^{8}\sum_{k=1}^{q}\beta_{j,k}b_{j,k}(x_{i,j})
+\end{aligned}
+$$
+
+Looking at the distribution of the residuals of the model, we can see that the data is clearly far too overdispersed to be modelled by a Poisson, which has a fixed dispersion parameter. Even with 80 knots per smooth term the model doesn't seem to have enough flexibility which may be another indicator that a Poisson model is unsuitable for such overdispersed data. We propose the conventional alternative to the Poisson - the Negative Binomial model. Doing so, leads to a drop in the AIC. So the model distribution is changed to Negative Binomial with the same parameterisation except for
+the feature that the count of TB cases is now Negative Binomial distributed with mean as described above.
+See Table \ref{tab:widgets} appendix for a showcase of different model configurations and their associated AIC.
+$$
+\begin{aligned}
+	TB_i \sim NB(\lambda_i , \sigma_i^2) \ TB_i\  \mathrm{indep.} 
+	\\
+	\lambda_i = z_i \rho_i ;\ \sigma_i^2 = \lambda_i +\frac{\lambda_i^2}{k}
+	\\
+	log(\lambda_i) = log(z_i) +  \sum_{j=1}^{8}\sum_{k=1}^{q}\beta_{j,k}b_{j,k}(x_{i,j})
+\end{aligned}
+$$
+where $k$ is a dispersion parameter, later estimated by  the  \texttt{gam} function in R.
+\newline
+
+When having a look at the relationship between the squared residuals and the fitted values one sees that the relation is not exactly quadratic, but rather close to 0, which would reflect the relation between model variance and the expected value in a Gaussian Distribution Model (additional evidence is provided by the Residuals vs. Fitted plot). However, fitting a Gaussian model leads to very skewed residuals, indicating that the data is apparently not Gaussian. So the model distribution is changed to Negative Binomial with the same parameterization except for the feature that the count of TB cases is now Negative Binomial distributed with mean $\lambda_{i}$ as described above.
+\newline
+
+Given this base model, we investigate whether all given socio-economic variables are needed to explain the response or whether there exists a model with fewer parameters. The p-value for the smooth term of Illiteracy points towards it not being statistically significant. Poverty, although not statistically insignificant, has the second-largest p-value. These terms are sequentially dropped and the resulting model checked against the original model via a Likelihood Ratio Test (conducted using the \texttt{anova} function in R). We find that leaving out Illiteracy does not alter the model at a 5\%-level of significance, whereas taking out both Poverty and Illiteracy does. So, in the following, we use a model with all of the socio-economic variables except Illiteracy. Note that this converts our linear predictor to 
+$$
+log(\lambda_i) = log(z_i) +  \sum_{j=1}^{7}\sum_{k=1}^{q}\beta_{j,k}b_{j,k}(x_{i,j})
+$$
+\newline
+
+This leaves us with a model with AIC = 14,391.19 and 43.9\% of deviance explained. Running \texttt{gam.check()} lets us analyse the residual plots (see Figure) and examine the basis functions for the model. The QQ plot tells us that the model fails to predict well on the upper and lower ends of the response variable. Increasing the knots to 20 per covariate leads to marginal improvement with 44.9\% deviance explained. More efficient extensions can be to add 1) spatial, 2) temporal and 3) spatio-temporal covariates.
+\newline
+
+First, we will try adding spatial terms. The spatial model adds a smoothed term which is function of the longitude and the latitude. A bivariate function is used because it makes sense to assume that there are more cases at certain locations (defined by the interaction between latitude and longitude) than others, rather than there being more cases at
+locations with a certain longitude for any latitude, or the other way round. Hence, our linear predictor is now
+$$
+log(\lambda_i) = log(z_i) +  \sum_{j=1}^{7}\sum_{k=1}^{q}\beta_{j,k}b_{j,k}(x_{i,j}) + \sum_{k=1}^{q}\beta_{k}b_{k}(lon_i , lat_i) 
+$$
+\newline
+
+Using this model with the regular \texttt{s} smoother function from the \texttt{mgcv} package leads to a model that can explain 56.4\% of the deviance and has a slightly lower AIC of 14,013.13. The QQ plot still points to the upper and lower tails being incorrectly predicted. At the cost of significantly more computation, using a tensor product smooth \texttt{te} on the bivariate spatial term with 20 knots allows us to make a decent improvement on this. See Appendix for different numbers of knots that were tested. This gets us to 69.9\% deviance explained. The QQ plot looks considerably better with only a few problematic instances at the top and bottom quantiles.
+
+We contest this with an extension on the model with only socio-economic covariates, but instead of adding spatial terms, we add the temporal dimension \texttt{Year}. The linear predictor becomes
+$$
+log(\lambda_i) = log(z_i) +  \sum_{j=1}^{7}f_{2012, j}(x_{i,j})\times x_{2012}  + \sum_{j=1}^{7}f_{2013, j}(x_{i,j})\times x_{2013} +  \sum_{j=1}^{7}f_{2014, j}(x_{i,j})\times x_{2014}
+$$
+where the new terms $x_{2012},x_{2013},x_{2014}$ are indicator variables equating to 1 if \texttt{Year} is respectively 2012,2013,2014 and zero otherwise. Exercising some shorthand, it can be expressed as
+$$
+log(\lambda_i) = log(z_i) +  \sum_{t=2012}^{2014}\sum_{j=1}^{7}f_{t, j}(x_{i,j})\times x_{t}
+$$
+where $x_t$ is now the indicator variable for \texttt{Year}. A slightly separate approach can be tested with \texttt{Year} as a covariate instead of a grouping variable. In that case, the linear predictor would be
+$$
+log(\lambda_i) = log(z_i) +  \sum_{j=1}^{7}f_{t, j}(x_{i,j}) + \sum_{t=2012}^{2014}\beta_t x_t
+$$
+Neither of the temporal formulations show much increase in deviance explained (the one with year as grouping variable actually shows a decrease to 41.5\%!). Their QQ plots are also much worse than the spatial model, showing gross deviations on high as well as low quantiles. Finally, we create a spatio-temporal model, including both \texttt{Year} as well as \texttt{lon,lat}. Its linear predictor is formulated as below
+$$
+log(\lambda_i) = log(z_i) +  \sum_{t=2012}^{2014}\left( \sum_{j=1}^{7}\sum_{k=1}^{q}\beta_{j,k}b_{j,k}(x_{i,j}) + \sum_{k=1}^{q}\beta_{k}b_{k}(lon_i , lat_i) \right) \times x_{t}
+$$
+\newline
+
+This is a model which includes the term for the location and estimates a functional relation for
+each year and each explaining variable. The AIC of this model does not drop compared to the spatial model,
+so the spatial model (given that it is simpler) is the model we choose to best explain the ratio of TB cases per capita. To recall, it is formulated as 
+$$
+log(\lambda_i) = log(z_i) +  \sum_{j=1}^{7}\sum_{k=1}^{q}\beta_{j,k}b_{j,k}(x_{i,j}) + \sum_{k=1}^{q}\beta_{k}b_{k}(lon_i , lat_i) 
+$$
+\newline
+
+Let us now have a closer look at the fit of the spatial model: It fits well even though the largest residuals are higher
+than expected from the model distribution. For districts that have a high number of cases, the predictor does
+not seem as accurate. But the highest residuals do not arise when the ratio of TB cases per capita
+is extraordinarily high, but rather when the absolute number of TB cases is high (see residuals vs. response).
+The variance of the model still seems too low for those values given that there are some predicted values in
+that high segment of response values (absolute number of TB cases) where the prediction for the response
+value is lower than the actual value, and some where the prediction of the actual value is higher than the
+actual value.
+\newline
+
+Using this model, we predict the rate of TB per 100,000 inhabitants. See Figure \ref{fig:pred_TB_rate_map}
+
+%\begin{figure}[H]
+%	\centering
+%	\subfloat[\centering label 1]{{\includegraphics[scale=0.5]{images/pred_TB_rate_map.jpg} }}%
+%	\qquad
+%	\subfloat[\centering label 2]{{\includegraphics[scale=0.5]{images/true_TB_rate_map.jpg} }}%
+%	\caption{Predicted (a) and True(b) rates of TB per 100k inhabitants}%
+%	\label{fig:pred_TB_rate_map}%
+%\end{figure}
