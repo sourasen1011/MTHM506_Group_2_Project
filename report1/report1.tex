@@ -1,6 +1,5 @@
 \documentclass{article}
-\usepackage{multicol}
-\usepackage[top=0.5in, showframe, total={7.2in, 10.7in}, a4paper]{geometry}
+\usepackage[top=0.3in, total={7.2in, 10.7in}, a4paper]{geometry}
 \usepackage{graphicx, lipsum} % Required for inserting images
 \usepackage{enumitem}
 \usepackage{amsmath}
@@ -9,12 +8,16 @@
 \usepackage{pdfpages}
 \usepackage{adjustbox}
 \usepackage{subfig} 
+\usepackage{parskip} 
 \usepackage{minted}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \usepackage{xcolor} % to access the named colour LightGray
 \definecolor{LightGray}{gray}{0.9}
+\setlength\parindent{0pt}
 
-\title{Analysis of 2014 Brazil Tuberculosis Data}
+
+
+\title{Analysis of 2012--2014 Brazil Tuberculosis Data}
 \author{
     Joshua Robert \\
     \and
@@ -30,7 +33,6 @@
 
 \maketitle
 
-\begin{multicols}{2}
 
 \input{introduction}
 
@@ -39,7 +41,7 @@
 \input{model}
 
 \input{review_conclusion}
-\end{multicols}
+
 
 \begin{figure}[H]
 	\centering
@@ -50,7 +52,6 @@
 	\label{fig:pred_TB_rate_map}%
 \end{figure}
 
-\vspace*{2cm}
 \input{references}
 
 \input{appendix}
