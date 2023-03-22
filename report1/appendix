@@ -1,7 +1,7 @@
 
 \section{Appendix}
 
-\subsection{Figures}
+\subsection*{Figures}
 
 \begin{figure}[H]
 \centering
@@ -9,7 +9,7 @@
 \caption{\label{fig:pearson_correl}Correlogram shows covariates with highest positive and negative correlations.}
 \end{figure}
 
-\subsection{Tables}
+\subsection*{Tables}
 
 \begin{table}[H]
 \centering
@@ -21,7 +21,7 @@ Gadgets & 13
 \caption{\label{tab:widgets}An example table.}
 \end{table}
 
-\subsection{Code}
+\subsection*{Code}
 \begin{minted}[
 frame=lines,
 framesep=2mm,
