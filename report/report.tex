@@ -179,6 +179,31 @@ Gadgets & 13
 
 \subsection{Code}
 \begin{verbatim}
+###################Modelling Code####################
+# Import Libraries
+library(mgcv) # required for GAM 
+
+#fit poisson model with socio-economic variables
+model_poisson <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) +  s(Illiteracy) +  
+s(Urbanisation) + s(Density) + s(Poverty) + s(Poor_Sanitation) + s(Unemployment) + s(Timeliness), 
+data = TBdata, family = poisson(link = 'log'))
+#check summary
+summary(model_poisson)
+model_poisson$aic
+par(mfrow = c(2,2),pch = 20)
+gam.check(model_poisson)
+
+
+
+
+
+
+
+
+
+
+
+
 #####################SS CODE######################
 # Import Libraries
 library(mgcv) # required for GAM 
@@ -511,12 +536,9 @@ library (mgcv)
 
 
 par(mfrow = c(2,2))
-#fit poisson model with socio-economic variables
-model_poisson <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) +  s(Illiteracy) +  s(Urbanisation) + s(Density) + s(Poverty) + s(Poor_Sanitation) + s(Unemployment) + s(Timeliness), data = TBdata, family = poisson(link = 'log'))
-summary(model_poisson)
-model_poisson$aic
-par(mfrow = c(2,2),pch = 20)
-gam.check(model_poisson)
+
+
+
 # #add flexibility
 model_poisson <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous, k = 80) +  s(Illiteracy, k = 80) +  s(Urbanisation, k = 80) + s(Density, k = 80) + s(Poverty, k = 80) + s(Poor_Sanitation, k = 80) + s(Unemployment, k = 80) + s(Timeliness, k = 80), data = TBdata, family = poisson(link = 'log'))
 gam.check(model_poisson)
