@@ -37,13 +37,13 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
-report1/report.aux
-report1/report.fdb_latexmk
-report1/report.fls
-report1/report.log
-report/report.aux
-report/report.fdb_latexmk
-report/report.fls
-report/report.log
-report/report.out
-report1/report.synctex.gz
+report1/report1.aux
+report1/report1.fdb_latexmk
+report1/report1.fls
+report1/report1.log
+report/report1.aux
+report/report1.fdb_latexmk
+report/report1.fls
+report/report1.log
+report/report1.out
+report1/report1.synctex.gz
