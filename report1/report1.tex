@@ -1,0 +1,62 @@
+\documentclass{article}
+\usepackage[top=0.3in, total={7.2in, 10.7in}, a4paper]{geometry}
+\usepackage{graphicx, lipsum} % Required for inserting images
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage[english]{babel}
+\usepackage[compact]{titlesec}
+\usepackage{pdfpages}
+\usepackage{adjustbox}
+\usepackage{subfig} 
+\usepackage{parskip} 
+\usepackage{minted}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{xcolor} % to access the named colour LightGray
+\definecolor{LightGray}{gray}{0.9}
+\setlength\parindent{0pt}
+
+
+
+\title{Analysis of 2012--2014 Brazil Tuberculosis Data}
+\author{
+    Joshua Robert \\
+    \and
+    Sen Souradeep \\
+    \and
+    Zhang Zhaoyuan \\
+    \and
+    Holste Lion
+}
+\date{March 2023}
+
+\begin{document}
+
+\maketitle
+
+
+\input{introduction}
+
+\input{eda}
+
+\input{model}
+
+\input{review_conclusion}
+
+
+\begin{figure}[H]
+	\centering
+	\subfloat[\centering label 1]{{\includegraphics[scale=0.5]{images/pred_TB_rate_map.jpg} }}%
+	\qquad
+	\subfloat[\centering label 2]{{\includegraphics[scale=0.5]{images/true_TB_rate_map.jpg} }}%
+	\caption{Predicted (a) and True(b) rates of TB per 100k inhabitants}%
+	\label{fig:pred_TB_rate_map}%
+\end{figure}
+
+\input{references}
+
+\input{appendix}
+
+
+
+\end{document}
+
