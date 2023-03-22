@@ -1,7 +1,7 @@
 # Fdb version 4
-["pdflatex"] 1679516121 "/Users/newmoon/Documents/GitHub/MTHM506_Group_2_Project/report1/report1.tex" "report1.pdf" "report1" 1679516123 2
+["pdflatex"] 1679516446 "/Users/newmoon/Documents/GitHub/MTHM506_Group_2_Project/report1/report1.tex" "report1.pdf" "report1" 1679516449 2
   "/Users/newmoon/Documents/GitHub/MTHM506_Group_2_Project/report1/report1.tex" 1679515603 1238 4f44ee233cce3ddc1f4823f7d4073b4d ""
-  "/dev/null" 1679516075 0 d41d8cd98f00b204e9800998ecf8427e ""
+  "/dev/null" 1679516445 0 d41d8cd98f00b204e9800998ecf8427e ""
   "/usr/local/texlive/2022/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1246382020 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
@@ -141,17 +141,17 @@
   "/usr/local/texlive/2022/texmf.cnf" 1647878952 577 209b46be99c9075fd74d4c0369380e8c ""
   "_minted-report1/3F192D04FEBDBB9E48A2304EB4526E656AA78E5287DAE139108B7112C5733F92.pygtex" 1679511838 49210 4e58af4886975bd1da0b5847547811d4 ""
   "_minted-report1/default.pygstyle" 1679511838 6365 683ea4fd81022f120108d52c508c17f9 ""
-  "appendix" 1679512483 15756 420973bb2a139d928b9e88d48e482b04 ""
+  "appendix" 1679516280 15759 d366a8c1aeb6cdefd7fdb82ffce91b0a ""
   "eda.tex" 1679516063 4039 b658418b49dec2b8495abf5466a0a6fb ""
   "images/pearson_correl.jpg" 1679512350 94723 e380d720f03426793b28bbde2d417866 ""
   "images/pred_TB_rate_map.jpg" 1679512350 131612 b8b997b8dc54561dacb10a800697cc9b ""
   "images/true_TB_rate_map.jpg" 1679512350 137163 0f781dce883a44719a1417491157a34b ""
   "introduction.tex" 1679516020 325 a23477a497c92bb4835d08e949e7b34f ""
-  "model.tex" 1679516118 8843 45fb70a42830290814d3926df7b47bb5 ""
+  "model.tex" 1679516443 8777 cde86cfce7fdc4db30a942867b26694f ""
   "references" 1679497601 114 9bc131fa92bfaacd5d583dfd9bb1de28 ""
-  "report1.aux" 1679516123 3039 d94157006f35c50edfb470820f7a9c73 "pdflatex"
-  "report1.out" 1679516123 1063 d2542adb394b8503b0f4d9eb30c19367 "pdflatex"
-  "report1.pyg" 1679516123 15119 3f192d04febdbb9e48a2304eb4526e65 "pdflatex"
+  "report1.aux" 1679516448 2701 892ece852df076709bad02b71a2079a3 "pdflatex"
+  "report1.out" 1679516448 807 85017053238b63162a8211e665584513 "pdflatex"
+  "report1.pyg" 1679516448 15119 3f192d04febdbb9e48a2304eb4526e65 "pdflatex"
   "report1.tex" 1679515603 1238 4f44ee233cce3ddc1f4823f7d4073b4d ""
   "review_conclusion.tex" 1679497476 164 08aecf92fed538817416a7fcdcc2284e ""
   (generated)

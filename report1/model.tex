@@ -38,26 +38,26 @@ $$
 \end{aligned}
 $$
 where $k$ is a dispersion parameter, later estimated by  the  \texttt{gam} function in R.
-\newline
+
 
 When having a look at the relationship between the squared residuals and the fitted values one sees that the relation is not exactly quadratic, but rather close to 0, which would reflect the relation between model variance and the expected value in a Gaussian Distribution Model (additional evidence is provided by the Residuals vs. Fitted plot). However, fitting a Gaussian model leads to very skewed residuals, indicating that the data is apparently not Gaussian. So the model distribution is changed to Negative Binomial with the same parameterization except for the feature that the count of TB cases is now Negative Binomial distributed with mean $\lambda_{i}$ as described above.
-\newline
+
 
 Given this base model, we investigate whether all given socio-economic variables are needed to explain the response or whether there exists a model with fewer parameters. The p-value for the smooth term of Illiteracy points towards it not being statistically significant. Poverty, although not statistically insignificant, has the second-largest p-value. These terms are sequentially dropped and the resulting model checked against the original model via a Likelihood Ratio Test (conducted using the \texttt{anova} function in R). We find that leaving out Illiteracy does not alter the model at a 5\%-level of significance, whereas taking out both Poverty and Illiteracy does. So, in the following, we use a model with all of the socio-economic variables except Illiteracy. Note that this converts our linear predictor to 
 $$
 log(\lambda_i) = log(z_i) +  \sum_{j=1}^{7}\sum_{k=1}^{q}\beta_{j,k}b_{j,k}(x_{i,j})
 $$
-\newline
+
 
 This leaves us with a model with AIC = 14,391.19 and 43.9\% of deviance explained. Running \texttt{gam.check()} lets us analyse the residual plots (see Figure) and examine the basis functions for the model. The QQ plot tells us that the model fails to predict well on the upper and lower ends of the response variable. Increasing the knots to 20 per covariate leads to marginal improvement with 44.9\% deviance explained. More efficient extensions can be to add 1) spatial, 2) temporal and 3) spatio-temporal covariates.
-\newline
+
 
 First, we will try adding spatial terms. The spatial model adds a smoothed term which is function of the longitude and the latitude. A bivariate function is used because it makes sense to assume that there are more cases at certain locations (defined by the interaction between latitude and longitude) than others, rather than there being more cases at
 locations with a certain longitude for any latitude, or the other way round. Hence, our linear predictor is now
 $$
 log(\lambda_i) = log(z_i) +  \sum_{j=1}^{7}\sum_{k=1}^{q}\beta_{j,k}b_{j,k}(x_{i,j}) + \sum_{k=1}^{q}\beta_{k}b_{k}(lon_i , lat_i) 
 $$
-\newline
+
 
 Using this model with the regular \texttt{s} smoother function from the \texttt{mgcv} package leads to a model that can explain 56.4\% of the deviance and has a slightly lower AIC of 14,013.13. The QQ plot still points to the upper and lower tails being incorrectly predicted. At the cost of significantly more computation, using a tensor product smooth \texttt{te} on the bivariate spatial term with 20 knots allows us to make a decent improvement on this. See Appendix for different numbers of knots that were tested. This gets us to 69.9\% deviance explained. The QQ plot looks considerably better with only a few problematic instances at the top and bottom quantiles.
 
@@ -77,7 +77,7 @@ Neither of the temporal formulations show much increase in deviance explained (t
 $$
 log(\lambda_i) = log(z_i) +  \sum_{t=2012}^{2014}\left( \sum_{j=1}^{7}\sum_{k=1}^{q}\beta_{j,k}b_{j,k}(x_{i,j}) + \sum_{k=1}^{q}\beta_{k}b_{k}(lon_i , lat_i) \right) \times x_{t}
 $$
-\newline
+
 
 This is a model which includes the term for the location and estimates a functional relation for
 each year and each explaining variable. The AIC of this model does not drop compared to the spatial model,
@@ -85,7 +85,7 @@ so the spatial model (given that it is simpler) is the model we choose to best e
 $$
 log(\lambda_i) = log(z_i) +  \sum_{j=1}^{7}\sum_{k=1}^{q}\beta_{j,k}b_{j,k}(x_{i,j}) + \sum_{k=1}^{q}\beta_{k}b_{k}(lon_i , lat_i) 
 $$
-\newline
+
 
 Let us now have a closer look at the fit of the spatial model: It fits well even though the largest residuals are higher
 than expected from the model distribution. For districts that have a high number of cases, the predictor does
@@ -95,8 +95,6 @@ The variance of the model still seems too low for those values given that there 
 that high segment of response values (absolute number of TB cases) where the prediction for the response
 value is lower than the actual value, and some where the prediction of the actual value is higher than the
 actual value.
-\newline
-
 Using this model, we predict the rate of TB per 100,000 inhabitants. See Figure \ref{fig:pred_TB_rate_map}
 
 %\begin{figure}[H]
