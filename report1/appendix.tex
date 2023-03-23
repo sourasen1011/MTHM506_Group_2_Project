@@ -8,34 +8,34 @@
 	\subfloat[\centering Predicted]{{\includegraphics[scale=0.6]{pred_TB_rate_map.jpg} }}%
 	\qquad
 	\subfloat[\centering True]{{\includegraphics[scale=0.6]{true_TB_rate_map.jpg} }}%
-	\caption{Predicted (a) and True (b) rates of TB per 100k inhabitants}%
+	\caption{Predicted (a) and True (b) rates of TB per 100k inhabitants. North-western parts of the country as well as parts near the south exhibit high TB incidence per capita. These would roughly correspond to the states (\textit{estados}) of Amazonas in the North-West, Sao Paolo in the South and Rio de Janeiro on the South East coast}%
 	\label{fig:pred_TB_rate_map}%
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{model_poisson_check.jpg}
-\caption{\label{fig:model_poisson_check}\texttt{gam.check( )} results for \texttt{model\_poisson}}
+\caption{\label{fig:model_poisson_check}\texttt{gam.check( )} results for \texttt{model\_poisson}. The data is overdispersed as can be seen from both the QQ-plot and the fanning of the Resids vs linear pred. plot. The histogram of residuals is also quite different from a gaussian distribution}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{model_nb_2_check.jpg}
-\caption{\label{fig:model_nb_2_check}\texttt{gam.check( )} results for \texttt{model\_nb\_2}}
+\caption{\label{fig:model_nb_2_check}\texttt{gam.check( )} results for \texttt{model\_nb\_2}. Albeit an improvement of the Poisson model, the model has a tough time correctly predicting values on the upper and lower quantiles}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{spatial_model_2_check.jpg}
-\caption{\label{fig:spatial_model_2_check}\texttt{gam.check( )} results for \texttt{spatial.model.2}}
+\caption{\label{fig:spatial_model_2_check}\texttt{gam.check( )} results for \texttt{spatial.model.2}. This is the model that has finally been used as temporal additions on top of this provide very little additional explanatory power}
 \end{figure}
 
 
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.5]{spatio_temporal_model_2_check.jpg}
-\caption{\label{fig:spatio_temporal_model_2_check}\texttt{gam.check( )} results for \texttt{spatial.temporal.model.2}}
-\end{figure}
+%\begin{figure}[H]
+%\centering
+%\includegraphics[scale=0.5]{spatio_temporal_model_2_check.jpg}
+%\caption{\label{fig:spatio_temporal_model_2_check}\texttt{gam.check( )} results for \texttt{spatial.temporal.model.2}}
+%\end{figure}
 
 \begin{figure}[H]
 \centering
@@ -55,7 +55,7 @@ Model & AIC & Deviance Explained\\\hline
 \texttt{model\_nb\_2} & 14389.56 & 43.9\%\\
 \texttt{model\_nb\_3} & 14405.00 & 43.0\%\\
 \texttt{model\_nb\_time} & 14389.70 & 44.0\%\\
-\texttt{temporal.model} & \textcolor{red}{14390.43} & 44.0\%\\
+\texttt{temporal.model} & 14390.43 & 44.0\%\\
 \texttt{spatial.model} & 14013.13 & 56.4\%\\
 \textcolor{teal}{\texttt{spatial.model.2}} & \textcolor{teal}{13650.8} & \textcolor{teal}{69.9\%}\\
 \texttt{spatial.model.temporal} & 14227.12 & 52.2\%\\
@@ -74,7 +74,7 @@ fontsize=\footnotesize,
 linenos
 ]{R}
 # Load Data
-load("C:/Users/soura/Documents/COMM511/group_coursework/datasets_project.RData")
+load("datasets_project.RData")
 # Import Libraries
 library(mgcv) # required for GAM 
 
@@ -183,7 +183,7 @@ family = nb(link = 'log')
 \end{minted}
 
 
-\subsection{Code Outputs}
+\subsection{Model Summaries and Residual Checks}
 \begin{minted}[
 frame=lines,
 framesep=2mm,

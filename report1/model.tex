@@ -27,7 +27,7 @@ $$
 
 Looking at the distribution of the residuals of the model, we can see that the data is clearly far too overdispersed to be modelled by a Poisson, which has a fixed dispersion parameter. Even with 60 knots per smooth term the model doesn't seem to have enough flexibility which may be another indicator that a Poisson model is unsuitable for the data. The residuals vs fitted plot fans out, indicating that the model does not have enough flexibility to fit well (the edf is also close  to the maximum degrees of freedom, and increasing the number of knots doesn't resolve the problem). We propose the conventional alternative to the Poisson - the Negative Binomial model. Doing so, leads to a drop in the AIC. So the model distribution is changed to Negative Binomial with the same parameterisation except for
 the feature that the count of TB cases is now Negative Binomial distributed with mean as described above.
-See Table \ref{tab:widgets} appendix for a showcase of different model configurations and their associated AIC.
+See Table \ref{tab:metrics} appendix for a showcase of different model configurations and their associated AIC.
 $$
 \begin{aligned}
 	TB_i \sim NB(\lambda_i , \sigma_i^2) \ TB_i\  \mathrm{indep.} 
