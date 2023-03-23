@@ -70,6 +70,18 @@ Model & AIC & Deviance Explained\\\hline
 \caption{\label{tab:metrics}Comparison of models.}
 \end{table}
 
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l|c|c|l}
+Model 1 & Model 2 & p-value & Conclusion \\\hline
+model\_nb & model\_nb\_2 & 0.5556 & Illiteracy dropped as a covariate\\
+model\_nb\_2 & model\_nb\_3 & 0.001861 & Poverty is retained\\
+spatial.model.2 & model\_nb\_2 & $<$ 2.2e-16 & Spatial covariates added into the model
+\end{tabular}
+\caption{\label{tab:ANOVA}Pairwise ANOVA tests for model comparison.}
+\end{table}
+
 \subsection{Code}
 \begin{minted}[
 frame=lines,
@@ -186,6 +198,13 @@ spatio.temporal.model.2 <- gam(formula = TB ~ offset(log(Population)) + s(Indige
 data = TBdata , 
 family = nb(link = 'log')
 )
+
+### Prediction
+preds <- round(predict(spatial.model.2 , newdata = TBdata , type = 'response'),4)
+preds_rate <- preds/TBdata$Population*100000
+
+### Plot
+plot.map(preds_rate , n.levels = 10)
 \end{minted}
 
 
