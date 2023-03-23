@@ -80,7 +80,10 @@ $$
 
 
 This is a model which includes the term for the location and estimates a functional relation for
-each year and each explaining variable. The AIC of this model does not drop compared to the spatial model. Reasons for this may be that 3 factors is perhaps not enough granularity to discern any effect from the temporal dimension. Maybe  having more granular data at month or week level would bring to light such temporal patterns, if they exist (\textcolor{red}{Not sure about the wording on this part?}). So the spatial model (given that it is simpler) is the model we choose to best explain the ratio of TB cases per capita. To recall, it is formulated as 
+each year and each explaining variable. The AIC of this model does not drop compared to the spatial model. Reasons for this may be that 3 factors is perhaps not enough granularity to discern any effect from the temporal dimension. Naive estimates would point towards the spread being higher in winter months as TB spreads through inhaling tiny droplets from coughs or sneezes. Having more granular data at the season or month level could bring to light any temporal patterns, if they exist.
+\newline
+
+So the spatial model (given that it is simpler) is the model we choose to best explain the ratio of TB cases per capita. To recall, it is formulated as 
 $$
 log(\lambda_i) = log(z_i) +  \sum_{j=1}^{7}\sum_{k=1}^{q}\beta_{j,k}b_{j,k}(x_{i,j}) + \sum_{k=1}^{q}\beta_{k}b_{k}(lon_i , lat_i) 
 $$

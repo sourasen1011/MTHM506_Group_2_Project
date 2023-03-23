@@ -39,8 +39,6 @@ bgcolor=LightGray,
 fontsize=\footnotesize,
 linenos
 ]{R}
-
-
 # Load Data
 load("C:/Users/soura/Documents/COMM511/group_coursework/datasets_project.RData")
 # Import Libraries
@@ -59,21 +57,18 @@ model_poisson$aic
 par(mfrow = c(2,2),pch = 20)
 gam.check(model_poisson)
 
-# #add flexibility
-# model_poisson.more.knots <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous, k = 60) 
-# + s(Illiteracy, k = 60) +  s(Urbanisation, k = 60) + s(Density, k = 60) 
-# + s(Poverty, k = 60) + s(Poor_Sanitation, k = 60) + s(Unemployment, k = 60) 
-# + s(Timeliness, k = 60), 
-# data = TBdata, 
-# family = poisson(link = 'log')
-# )
-# 
-# par(mfrow=c(2,2))
-# gam.check(model_poisson.more.knots)
-# summary(model_poisson.more.knots) # SIGNS OF OVERFIT
-# par(mfrow=c(2,4))
-# plot(model_poisson.more.knots) # SIGNS OF OVERFIT
-# par(mfrow=c(2,2))
+#add flexibility
+model_poisson.more.knots <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous, k = 60) 
++ s(Illiteracy, k = 60) +  s(Urbanisation, k = 60) + s(Density, k = 60) 
++ s(Poverty, k = 60) + s(Poor_Sanitation, k = 60) + s(Unemployment, k = 60) 
++ s(Timeliness, k = 60), 
+data = TBdata, 
+family = poisson(link = 'log')
+)
+# check summary
+gam.check(model_poisson.more.knots)
+summary(model_poisson.more.knots) # SIGNS OF OVERFIT
+plot(model_poisson.more.knots) # SIGNS OF OVERFIT
 
 #fit negative binomial model with  socioeconomic
 model_nb <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) 
@@ -85,8 +80,8 @@ data = TBdata, family = nb(link = 'log')
 summary(model_nb)
 model_nb$aic
 
-
-#fit a linear relation between squared residuals and prediction to see whether another model describes the variance-fitted values relation better
+#fit a linear relation between squared residuals and prediction to see whether another model describes
+#the variance-fitted values relation better
 summary(lm(log(model_nb$residuals^2) ~ log(predict(model_nb, type = 'response'))))
 
 #drop Illiteracy
@@ -105,7 +100,7 @@ model_nb_3 <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) +  s(Ur
 data = TBdata, 
 family = nb(link = 'log')
 )
-#LRT
+# Likelihood ratio test
 anova.gam(model_nb_3, model_nb_2, test = 'F')# p-value is less than 0.05
 # The models are statistically different. Poverty should not be excluded.
 
