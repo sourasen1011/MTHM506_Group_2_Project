@@ -7,7 +7,7 @@ $$
 	log(\lambda_i) = log(z_i) + log(\rho_i)
 \end{aligned}
 $$
-where $TB_i$ is the count of TB cases, $z_i$ is the total population. Model $log(\rho_i)$ as
+where $TB_i$ is the count of TB cases. We are using the canonical link function - log. $z_i$ is the total population, which is taken as an offset. Model $log(\rho_i)$ as
 
 $$
 \begin{aligned}
@@ -16,7 +16,7 @@ $$
 	f(x_i) = \sum_{k=1}^{q}\beta_{k}b_{k}(x_i)
 \end{aligned}
 $$
-where $x_{i,j}$ is the $j$th covariate (out of 8 socio-economic covariates) for the $i$th instance/datum in the dataset and $f(\cdot)$ is a smooth function of said covariate. Hence, the model boils down to
+where $x_{i,j}$ is the $j$th covariate (out of 8 socio-economic covariates) for the $i$th instance/datum in the dataset, $f(\cdot)$ is a smooth function of said covariate and $b_k(\cdot)$ is a basis function with $k$ knots. Hence, the model boils down to
 $$
 \begin{aligned}
 	TB_i \sim Pois(\lambda_i = z_i \rho_i) \ TB_i\  \mathrm{indep.} 
@@ -32,12 +32,12 @@ $$
 \begin{aligned}
 	TB_i \sim NB(\lambda_i , \sigma_i^2) \ TB_i\  \mathrm{indep.} 
 	\\
-	\lambda_i = z_i \rho_i ;\ \sigma_i^2 = \lambda_i +\frac{\lambda_i^2}{k}
+	\lambda_i = z_i \rho_i ;\ \sigma_i^2 = \lambda_i +\frac{\lambda_i^2}{\phi}
 	\\
 	log(\lambda_i) = log(z_i) +  \sum_{j=1}^{8}\sum_{k=1}^{q}\beta_{j,k}b_{j,k}(x_{i,j})
 \end{aligned}
 $$
-where $k$ is a dispersion parameter, later estimated by  the  \texttt{gam} function in R.
+where $\phi$ is a dispersion parameter, later estimated by  the  \texttt{gam} function in R.
 
 
 When having a look at the relationship between the squared residuals and the fitted values one sees that the relation is not exactly quadratic, but rather close to 0, which would reflect the relation between model variance and the expected value in a Gaussian Distribution Model (additional evidence is provided by the Residuals vs. Fitted plot). However, fitting a Gaussian model leads to very skewed residuals, indicating that the data is apparently not Gaussian. So the model distribution is changed to Negative Binomial with the same parameterization except for the feature that the count of TB cases is now Negative Binomial distributed with mean $\lambda_{i}$ as described above.
@@ -75,7 +75,7 @@ log(\lambda_i) = log(z_i) +  \sum_{j=1}^{7}f_{t, j}(x_{i,j}) + \sum_{t=2012}^{20
 $$
 Neither of the temporal formulations show much increase in deviance explained (the one with year as grouping variable actually shows a decrease to 41.5\%!). Their QQ plots are also much worse than the spatial model, showing gross deviations on high as well as low quantiles. Finally, we create a spatio-temporal model, including both \texttt{Year} as well as \texttt{lon,lat}. Its linear predictor is formulated as below
 $$
-log(\lambda_i) = log(z_i) +  \sum_{t=2012}^{2014}\left( \sum_{j=1}^{7}\sum_{k=1}^{q}\beta_{j,k}b_{j,k}(x_{i,j}) + \sum_{k=1}^{q}\beta_{k}b_{k}(lon_i , lat_i) \right) \times x_{t}
+log(\lambda_i) = log(z_i) +  \sum_{t=2012}^{2014}\left( \sum_{j=1}^{7}\sum_{k=1}^{q}\beta_{t,j,k}b_{t,j,k}(x_{t,i,j}) + \sum_{k=1}^{q}\beta_{t,k}b_{t,k}(lon_{i,t} , lat_{i,t}) \right) \times x_{t}
 $$
 
 

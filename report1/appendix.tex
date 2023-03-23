@@ -4,9 +4,18 @@
 \subsection{Figures}
 
 \begin{figure}[H]
+	\centering
+	\subfloat[\centering Predicted]{{\includegraphics[scale=0.6]{pred_TB_rate_map.jpg} }}%
+	\qquad
+	\subfloat[\centering True]{{\includegraphics[scale=0.6]{true_TB_rate_map.jpg} }}%
+	\caption{Predicted (a) and True (b) rates of TB per 100k inhabitants}%
+	\label{fig:pred_TB_rate_map}%
+\end{figure}
+
+\begin{figure}[H]
 \centering
-\includegraphics[scale=0.5]{pearson_correl.jpg}
-\caption{\label{fig:pearson_correl}Correlogram shows covariates with highest positive and negative correlations.}
+\includegraphics[scale=0.5]{spearman_correl.jpg}
+\caption{\label{fig:spearman_correl}Correlogram shows covariates with highest positive and negative correlations.}
 \end{figure}
 
 \subsection{Tables}
