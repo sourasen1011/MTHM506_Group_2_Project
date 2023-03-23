@@ -25,7 +25,7 @@ $$
 \end{aligned}
 $$
 
-Looking at the distribution of the residuals of the model, we can see that the data is clearly far too overdispersed to be modelled by a Poisson, which has a fixed dispersion parameter. Even with 80 knots per smooth term the model doesn't seem to have enough flexibility which may be another indicator that a Poisson model is unsuitable for such overdispersed data. We propose the conventional alternative to the Poisson - the Negative Binomial model. Doing so, leads to a drop in the AIC. So the model distribution is changed to Negative Binomial with the same parameterisation except for
+Looking at the distribution of the residuals of the model, we can see that the data is clearly far too overdispersed to be modelled by a Poisson, which has a fixed dispersion parameter. Even with 60 knots per smooth term the model doesn't seem to have enough flexibility which may be another indicator that a Poisson model is unsuitable for such overdispersed data (\textcolor{red}{explain why?}). The model does not have enough flexibility to fit well (the edf is close  to the maximum degrees of freedom, and increasing the number of knots doesn't resolve the problem). We propose the conventional alternative to the Poisson - the Negative Binomial model. Doing so, leads to a drop in the AIC. So the model distribution is changed to Negative Binomial with the same parameterisation except for
 the feature that the count of TB cases is now Negative Binomial distributed with mean as described above.
 See Table \ref{tab:widgets} appendix for a showcase of different model configurations and their associated AIC.
 $$
@@ -80,8 +80,7 @@ $$
 
 
 This is a model which includes the term for the location and estimates a functional relation for
-each year and each explaining variable. The AIC of this model does not drop compared to the spatial model,
-so the spatial model (given that it is simpler) is the model we choose to best explain the ratio of TB cases per capita. To recall, it is formulated as 
+each year and each explaining variable. The AIC of this model does not drop compared to the spatial model. Reasons for this may be that 3 factors is perhaps not enough granularity to discern any effect from the temporal dimension. Maybe  having more granular data at month or week level would bring to light such temporal patterns, if they exist (\textcolor{red}{Not sure about the wording on this part?}). So the spatial model (given that it is simpler) is the model we choose to best explain the ratio of TB cases per capita. To recall, it is formulated as 
 $$
 log(\lambda_i) = log(z_i) +  \sum_{j=1}^{7}\sum_{k=1}^{q}\beta_{j,k}b_{j,k}(x_{i,j}) + \sum_{k=1}^{q}\beta_{k}b_{k}(lon_i , lat_i) 
 $$
