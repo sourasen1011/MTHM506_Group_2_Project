@@ -14,20 +14,54 @@
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.5]{spearman_correl.jpg}
+\includegraphics[scale=0.5]{model_poisson_check.jpg}
+\caption{\label{fig:model_poisson_check}\texttt{gam.check( )} results for \texttt{model\_poisson}}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{model_nb_2_check.jpg}
+\caption{\label{fig:model_nb_2_check}\texttt{gam.check( )} results for \texttt{model\_nb\_2}}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{spatial_model_2_check.jpg}
+\caption{\label{fig:spatial_model_2_check}\texttt{gam.check( )} results for \texttt{spatial.model.2}}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{spatio_temporal_model_2_check.jpg}
+\caption{\label{fig:spatio_temporal_model_2_check}\texttt{gam.check( )} results for \texttt{spatial.temporal.model.2}}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{spearman_correl.jpg}
 \caption{\label{fig:spearman_correl}Correlogram shows covariates with highest positive and negative correlations.}
 \end{figure}
+
 
 \subsection{Tables}
 
 \begin{table}[H]
 \centering
-\begin{tabular}{c|c|c}
+\begin{tabular}{l|c|c}
 Model & AIC & Deviance Explained\\\hline
-model\_poisson & 34047.36 & 66.9\%\\
-Gadgets & 13 & 14
+\texttt{model\_poisson} & 34047.36 & 66.9\%\\
+\texttt{model\_nb} & 14391.19 & 43.9\%\\
+\texttt{model\_nb\_2} & 14389.56 & 43.9\%\\
+\texttt{model\_nb\_3} & 14405.00 & 43.0\%\\
+\texttt{model\_nb\_time} & 14389.70 & 44.0\%\\
+\texttt{temporal.model} & \textcolor{red}{14390.43} & 44.0\%\\
+\texttt{spatial.model} & 14013.13 & 56.4\%\\
+\textcolor{teal}{\texttt{spatial.model.2}} & \textcolor{teal}{13650.8} & \textcolor{teal}{69.9\%}\\
+\texttt{spatial.model.temporal} & 14227.12 & 52.2\%\\
+\texttt{spatial.model.temporal.2} & 13647.93 & 70.1\%
 \end{tabular}
-\caption{\label{tab:widgets}An example table.}
+\caption{\label{tab:metrics}Comparison of models.}
 \end{table}
 
 \subsection{Code}
@@ -60,10 +94,6 @@ model_poisson.more.knots <- gam(formula = TB ~ offset(log(Population)) + s(Indig
 data = TBdata, 
 family = poisson(link = 'log')
 )
-# check summary
-gam.check(model_poisson.more.knots)
-summary(model_poisson.more.knots) # SIGNS OF OVERFIT
-plot(model_poisson.more.knots) # SIGNS OF OVERFIT
 
 #fit negative binomial model with  socioeconomic
 model_nb <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) 
@@ -71,9 +101,6 @@ model_nb <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous)
 + s(Unemployment) + s(Timeliness), 
 data = TBdata, family = nb(link = 'log')
 )
-#Show summary
-summary(model_nb)
-model_nb$aic
 
 #fit a linear relation between squared residuals and prediction to see whether another model describes
 #the variance-fitted values relation better
@@ -101,35 +128,15 @@ anova.gam(model_nb_3, model_nb_2, test = 'F')# p-value is less than 0.05
 
 ### Model chosen (with socio-economic covariates) is the negative binomial without Illiteracy
 ### as the effect of illiteracy cannot be reliably stated to be non-zero
-summary(model_nb_2)# Only 44% of the deviance is explained. Adding temporal
-# and spatial covariates may improve this
-par(mfrow=c(2,2))
-gam.check(model_nb_2)
-
-### Increasing the knots to 20 yields minor improvement - discarded
-prelim.model.4 <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous , k = 20) 
-+ s(Urbanisation , k = 20) + s(Density , k = 20) + s(Poverty , k = 20)
-+ s(Poor_Sanitation , k = 20) + s(Unemployment , k = 20) + s(Timeliness , k = 20),
-data = TBdata ,
-family = nb(link = 'log')
-)
-# Show summary
-summary(prelim.model.4)
-par(mfrow=c(2,2))
-gam.check(prelim.model.4)
 
 #### Introducing temporality as a grouping variable
 #Temporal model
-par(mfrow = c(2,2), pch = 20)
 model_nb_time <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous, by = Year) 
 + s(Urbanisation, by = Year) + s(Density, by = Year) + s(Poverty, by = Year) + s(Poor_Sanitation, by = Year) 
 + s(Unemployment, by = Year) + s(Timeliness, by = Year), 
 data = TBdata, 
 family = nb(link = 'log')
 )
-# Show summary
-summary(model_nb_time)
-model_nb_time$aic
 
 #### Temporality as a covariate
 TBdata$Year.asFactor <- factor(TBdata$Year)
@@ -140,12 +147,6 @@ temporal.model <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous)
 data = TBdata ,
 family = nb(link = 'log')
 )
-# Check summary
-summary(temporal.model) # Temporal alone doesn't add much to explaining the variance
-
-par(mfrow=c(2,2))
-gam.check(temporal.model)
-par(mfrow = c(1,1))
 
 ### Adding spatial covariates
 spatial.model <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) 
@@ -154,13 +155,6 @@ spatial.model <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous)
 data = TBdata , 
 family = nb(link = 'log')
 )
-# Check summary
-summary(spatial.model)
-
-par(mfrow=c(2,2))
-gam.check(spatial.model)
-par(mfrow = c(1,1))
-spatial.model$aic
 
 ### Using separate smoothers
 spatial.model.2 <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) 
@@ -169,13 +163,6 @@ spatial.model.2 <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous)
 data = TBdata , 
 family = nb(link = 'log')
 )
-# Check summary
-summary(spatial.model.2)
-
-spatial.model.2$aic
-par(mfrow=c(2,2))
-gam.check(spatial.model.2 , pch = 20)
-par(mfrow = c(1,1))
 
 # Check if this model is significantly different from one with only socio-economic covariates
 anova.gam(spatial.model.2, model_nb_2, test = 'LRT')
@@ -185,9 +172,6 @@ spatio.temporal.model <- gam(formula = TB ~ offset(log(Population)) + s(Urbanisa
 + s(Density, by = Year.asFactor) + s(Poverty, by = Year.asFactor) 
 + s(Poor_Sanitation, by = Year.asFactor) + s(Timeliness, by = Year.asFactor) 
 + s(Unemployment, by = Year.asFactor) + te(lon,lat, by = Year.asFactor), data = TBdata, family = nb(link = 'log'))
-summary(spatio.temporal.model)
-spatio.temporal.model$aic
-gam.check(spatio.temporal.model)
 
 ### Spatio-temporal model (with Year as parametric covariate)
 spatio.temporal.model.2 <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous) 
@@ -196,12 +180,6 @@ spatio.temporal.model.2 <- gam(formula = TB ~ offset(log(Population)) + s(Indige
 data = TBdata , 
 family = nb(link = 'log')
 )
-# Check summary
-summary(spatio.temporal.model.2) # Temporal dimension as a parametric variable explains 
-# slightly more of the deviance
-spatio.temporal.model.2$aic
-gam.check(spatio.temporal.model.2 , pch = 20)
-
 \end{minted}
 
 
@@ -244,7 +222,173 @@ s(Timeliness)      8.352  8.864  600.7  <2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-R-sq.(adj) =  0.976   Deviance explained = 66.9%
+R-sq.(adj) =  0.976   Deviance explained = 0.669
 UBRE = 13.899  Scale est. = 1         n = 1671
 
+model_poisson$aic
+34047.36
+
+# Excerpt from residual check
+gam.check(model_poisson)
+
+                     k`  edf k-index p-value    
+s(Indigenous)      9.00 8.96    0.39  <2e-16 ***
+s(Illiteracy)      9.00 8.99    0.41  <2e-16 ***
+s(Urbanisation)    9.00 8.90    0.41  <2e-16 ***
+s(Density)         9.00 8.98    0.39  <2e-16 ***
+s(Poverty)         9.00 8.96    0.39  <2e-16 ***
+s(Poor_Sanitation) 9.00 8.98    0.40  <2e-16 ***
+s(Unemployment)    9.00 8.99    0.39  <2e-16 ***
+s(Timeliness)      9.00 8.35    0.43  <2e-16 ***
+---
+
+#check summary
+summary(model_nb_2)
+
+Family: Negative Binomial(6.146) 
+Link function: log 
+
+Formula:
+TB ~ offset(log(Population)) + s(Indigenous) + s(Urbanisation) + 
+    s(Density) + s(Poverty) + s(Poor_Sanitation) + s(Unemployment) + 
+    s(Timeliness)
+
+Parametric coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -8.42863    0.01094  -770.6   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Approximate significance of smooth terms:
+                     edf Ref.df Chi.sq  p-value    
+s(Indigenous)      1.518  1.833  21.13 2.08e-05 ***
+s(Urbanisation)    6.610  7.752  23.73  0.00167 ** 
+s(Density)         4.578  5.667 147.64  < 2e-16 ***
+s(Poverty)         5.771  6.945  21.36  0.00394 ** 
+s(Poor_Sanitation) 6.119  7.293  76.07  < 2e-16 ***
+s(Unemployment)    5.776  6.977  64.21  < 2e-16 ***
+s(Timeliness)      4.106  5.103  66.42  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+R-sq.(adj) =   0.86   Deviance explained = 0.439
+-REML = 7234.9  Scale est. = 1         n = 1671
+
+model_nb_2$aic
+14389.56
+
+# Excerpt from residual check
+gam.check(model_nb_2)
+
+                     k`  edf k-index p-value    
+s(Indigenous)      9.00 1.52    0.49  <2e-16 ***
+s(Urbanisation)    9.00 6.61    0.50  <2e-16 ***
+s(Density)         9.00 4.58    0.50  <2e-16 ***
+s(Poverty)         9.00 5.77    0.49  <2e-16 ***
+s(Poor_Sanitation) 9.00 6.12    0.50  <2e-16 ***
+s(Unemployment)    9.00 5.78    0.50  <2e-16 ***
+s(Timeliness)      9.00 4.11    0.56  <2e-16 ***
+---
+
+# check summary
+summary(spatial.model.2)
+
+Family: Negative Binomial(12.246) 
+Link function: log 
+
+Formula:
+TB ~ offset(log(Population)) + s(Indigenous) + s(Urbanisation) + 
+    s(Density) + s(Poor_Sanitation) + s(Unemployment) + s(Poverty) + 
+    s(Timeliness) + te(lon, lat, k = 20)
+
+Parametric coefficients:
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -8.467186   0.008485  -997.9   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Approximate significance of smooth terms:
+                       edf  Ref.df  Chi.sq  p-value    
+s(Indigenous)        3.700   4.346   19.53 0.000922 ***
+s(Urbanisation)      5.188   6.221   52.90  < 2e-16 ***
+s(Density)           4.107   5.012   38.40 1.58e-06 ***
+s(Poor_Sanitation)   5.367   6.412   27.55 0.000174 ***
+s(Unemployment)      4.132   5.125   79.61  < 2e-16 ***
+s(Poverty)           6.716   7.729   42.69  < 2e-16 ***
+s(Timeliness)        2.445   3.053   46.59  < 2e-16 ***
+te(lon,lat)        139.341 174.137 1088.66  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+R-sq.(adj) =  0.926   Deviance explained = 0.699
+-REML = 6987.8  Scale est. = 1         n = 1671
+
+spatial.model.2$aic
+13650.8
+
+#Excerpt from residual check
+gam.check(spatial.model.2)
+
+                       k`    edf k-index p-value    
+s(Indigenous)        9.00   3.70    0.63  <2e-16 ***
+s(Urbanisation)      9.00   5.19    0.61  <2e-16 ***
+s(Density)           9.00   4.11    0.63  <2e-16 ***
+s(Poor_Sanitation)   9.00   5.37    0.61  <2e-16 ***
+s(Unemployment)      9.00   4.13    0.62  <2e-16 ***
+s(Poverty)           9.00   6.72    0.61  <2e-16 ***
+s(Timeliness)        9.00   2.45    0.66  <2e-16 ***
+te(lon,lat)        399.00 139.34    0.65  <2e-16 ***
+---
+
+# check summary
+summary(spatio.temporal.model.2)
+
+Family: Negative Binomial(12.299) 
+Link function: log 
+
+Formula:
+TB ~ offset(log(Population)) + s(Indigenous) + s(Urbanisation) + 
+    s(Density) + s(Poor_Sanitation) + s(Unemployment) + s(Poverty) + 
+    s(Timeliness) + te(lon, lat, k = 20) + Year.asFactor
+
+Parametric coefficients:
+                    Estimate Std. Error  z value Pr(>|z|)    
+(Intercept)       -8.4532889  0.0144206 -586.197   <2e-16 ***
+Year.asFactor2013 -0.0005816  0.0201595   -0.029    0.977    
+Year.asFactor2014 -0.0417054  0.0202005   -2.065    0.039 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Approximate significance of smooth terms:
+                       edf  Ref.df  Chi.sq  p-value    
+s(Indigenous)        3.702   4.347   19.56 0.000912 ***
+s(Urbanisation)      5.197   6.230   53.05  < 2e-16 ***
+s(Density)           4.107   5.011   38.45 1.89e-06 ***
+s(Poor_Sanitation)   5.374   6.418   27.61 0.000170 ***
+s(Unemployment)      4.145   5.140   80.03  < 2e-16 ***
+s(Poverty)           6.722   7.734   42.72  < 2e-16 ***
+s(Timeliness)        2.460   3.070   46.59  < 2e-16 ***
+te(lon,lat)        139.707 174.516 1093.31  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+R-sq.(adj) =  0.926   Deviance explained = 0.701
+-REML = 6991.1  Scale est. = 1         n = 1671
+
+spatio.temporal.model.2$aic
+13647.93
+
+#Excerpt from residual check
+gam.check(spatio.temporal.model.2)
+
+                       k`    edf k-index p-value    
+s(Indigenous)        9.00   3.70    0.63  <2e-16 ***
+s(Urbanisation)      9.00   5.20    0.60  <2e-16 ***
+s(Density)           9.00   4.11    0.62  <2e-16 ***
+s(Poor_Sanitation)   9.00   5.37    0.61  <2e-16 ***
+s(Unemployment)      9.00   4.15    0.61  <2e-16 ***
+s(Poverty)           9.00   6.72    0.61  <2e-16 ***
+s(Timeliness)        9.00   2.46    0.66  <2e-16 ***
+te(lon,lat)        399.00 139.71    0.64  <2e-16 ***
+---
 \end{minted}
