@@ -22,10 +22,10 @@
 
 \begin{table}[H]
 \centering
-\begin{tabular}{l|r}
-Item & Quantity \\\hline
-Widgets & 42 \\
-Gadgets & 13
+\begin{tabular}{c|c|c}
+Model & AIC & Deviance Explained\\\hline
+model\_poisson & 34047.36 & 66.9\%\\
+Gadgets & 13 & 14
 \end{tabular}
 \caption{\label{tab:widgets}An example table.}
 \end{table}
@@ -51,11 +51,6 @@ model_poisson <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous)
 data = TBdata, 
 family = poisson(link = 'log')
 )
-#check summary
-summary(model_poisson)
-model_poisson$aic
-par(mfrow = c(2,2),pch = 20)
-gam.check(model_poisson)
 
 #add flexibility
 model_poisson.more.knots <- gam(formula = TB ~ offset(log(Population)) + s(Indigenous, k = 60) 
@@ -219,5 +214,37 @@ bgcolor=LightGray,
 fontsize=\footnotesize,
 linenos
 ]{R}
+# check summary
+summary(model_poisson)
+
+Family: poisson 
+Link function: log 
+
+Formula:
+TB ~ offset(log(Population)) + s(Indigenous) + s(Illiteracy) + 
+    s(Urbanisation) + s(Density) + s(Poverty) + s(Poor_Sanitation) + 
+    s(Unemployment) + s(Timeliness)
+
+Parametric coefficients:
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -8.449827   0.004199   -2012   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Approximate significance of smooth terms:
+                     edf Ref.df Chi.sq p-value    
+s(Indigenous)      8.961  8.999  569.4  <2e-16 ***
+s(Illiteracy)      8.989  9.000 2704.0  <2e-16 ***
+s(Urbanisation)    8.900  8.996 1490.4  <2e-16 ***
+s(Density)         8.985  9.000 1758.4  <2e-16 ***
+s(Poverty)         8.956  8.999 1470.2  <2e-16 ***
+s(Poor_Sanitation) 8.979  9.000 1327.0  <2e-16 ***
+s(Unemployment)    8.993  9.000 2423.5  <2e-16 ***
+s(Timeliness)      8.352  8.864  600.7  <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+R-sq.(adj) =  0.976   Deviance explained = 66.9%
+UBRE = 13.899  Scale est. = 1         n = 1671
 
 \end{minted}
