@@ -1,5 +1,5 @@
 \section{Model}
-We want to model the count of cases $TB_i$ by actually modelling $\rho_i$ using
+We want to model the count of cases $TB_i$ by actually modelling $\rho_i$ (the \textit{rate} of TB incidence per unit of population) using
 $$
 \begin{aligned}
 	TB_i \sim Pois(\lambda_i = z_i \rho_i) \ TB_i\  \mathrm{indep.} 
@@ -25,9 +25,10 @@ $$
 \end{aligned}
 $$
 
-Looking at the distribution of the residuals of the model, we can see that the data is clearly far too overdispersed to be modelled by a Poisson, which has a fixed dispersion parameter. Even with 60 knots per smooth term the model doesn't seem to have enough flexibility which may be another indicator that a Poisson model is unsuitable for the data. The residuals vs fitted plot fans out, indicating that the model does not have enough flexibility to fit well (the edf is also close  to the maximum degrees of freedom, and increasing the number of knots doesn't resolve the problem). We propose the conventional alternative to the Poisson - the Negative Binomial model. Doing so, leads to a drop in the AIC. So the model distribution is changed to Negative Binomial with the same parameterisation except for
-the feature that the count of TB cases is now Negative Binomial distributed with mean as described above.
-See Table \ref{tab:metrics} appendix for a showcase of different model configurations and their associated AIC.
+Looking at the distribution of the residuals of the model, we can see that the data is clearly far too overdispersed to be modelled by a Poisson distribution, which has a fixed dispersion parameter (see Figure \ref{fig:model_poisson_check}). Even with 60 knots per smooth term the model does not seem to have enough flexibility which may be another indicator that a Poisson model is unsuitable for the data. The residuals vs fitted plot fans out, indicating that the model does not have enough flexibility to fit well. The edf is also close to the maximum degrees of freedom, and increasing the number of knots does not resolve the problem - see results for \texttt{gam.check(model\_poisson)} in Appendix. We propose the conventional alternative to the Poisson - the Negative Binomial model. Doing so, leads to a drop in the AIC. See Table \ref{tab:metrics} Appendix for a showcase of different model configurations and their associated AIC.
+
+\ref{tab:metrics}
+
 $$
 \begin{aligned}
 	TB_i \sim NB(\lambda_i , \sigma_i^2) \ TB_i\  \mathrm{indep.} 
@@ -40,32 +41,29 @@ $$
 where $\phi$ is a dispersion parameter, later estimated by  the  \texttt{gam} function in R.
 
 
-When having a look at the relationship between the squared residuals and the fitted values one sees that the relation is not exactly quadratic, but rather close to 0, which would reflect the relation between model variance and the expected value in a Gaussian Distribution Model (additional evidence is provided by the Residuals vs. Fitted plot). However, fitting a Gaussian model leads to very skewed residuals, indicating that the data is apparently not Gaussian. So the model distribution is changed to Negative Binomial with the same parameterization except for the feature that the count of TB cases is now Negative Binomial distributed with mean $\lambda_{i}$ as described above.
+When having a look at the relationship between the squared residuals and the fitted values, one sees that the relation is not exactly quadratic, but rather close to 0. This would reflect the relation between model variance and the expected value in a Gaussian Distribution Model (additional evidence is provided by the Residuals vs. Fitted plot in Figure \ref{fig:model_poisson_check}). However, fitting a Gaussian model leads to very skewed residuals, indicating that the data is apparently not Gaussian. So, the model distribution is changed to Negative Binomial with the same parameterisation except for the feature that the count of TB cases is now Negative Binomial distributed with mean $\lambda_{i}$ as described above.
 
-
-Given this base model, we investigate whether all given socio-economic variables are needed to explain the response or whether there exists a model with fewer parameters. The p-value for the smooth term of Illiteracy points towards it not being statistically significant. Poverty, although not statistically insignificant, has the second-largest p-value. These terms are sequentially dropped and the resulting model checked against the original model via a Likelihood Ratio Test (conducted using the \texttt{anova} function in R). We find that leaving out Illiteracy does not alter the model at a 5\%-level of significance, whereas taking out both Poverty and Illiteracy does. So, in the following, we use a model with all of the socio-economic variables except Illiteracy. Note that this converts our linear predictor to 
+Given this base model, we investigate whether all given socio-economic covariates are needed to explain the response or whether there exists a model with fewer parameters. The p-value for the smooth term of Illiteracy points towards it not being statistically significant. Poverty, although not statistically insignificant, has the second largest p-value. These terms are sequentially dropped and the resulting model is checked against the original model via a Likelihood Ratio Test conducted using the \texttt{anova} function in R (see Table \ref{tab:ANOVA}). We find that leaving out Illiteracy does not alter the model at a 5\% level of significance, whereas taking out both Poverty and Illiteracy does. So, in the following, we use a model with all of the socio-economic covariates except Illiteracy. Note that this converts our linear predictor to 
 $$
 log(\lambda_i) = log(z_i) +  \sum_{j=1}^{7}\sum_{k=1}^{q}\beta_{j,k}b_{j,k}(x_{i,j})
 $$
 
 
-This leaves us with a model with AIC = 14,391.19 and 43.9\% of deviance explained. Running \texttt{gam.check()} lets us analyse the residual plots (see Figure) and examine the basis functions for the model. The QQ plot tells us that the model fails to predict well on the upper and lower ends of the response variable. Increasing the knots to 20 per covariate leads to marginal improvement with 44.9\% deviance explained. More efficient extensions can be to add 1) spatial, 2) temporal and 3) spatio-temporal covariates.
+This leaves us with a model with AIC = 14,391.19 and 43.9\% of deviance explained. Running \texttt{gam.check()} lets us analyse the residual plots (see Figure \ref{fig:model_nb_2_check}) and examine the basis functions for the model. The QQ plot tells us that the model fails to predict well on the upper and lower ends of the response variable. Increasing the knots to 20 per covariate leads to marginal improvement with 44.9\% deviance explained and hence, it is discarded. More efficient extensions can be to add 1) spatial, 2) temporal and 3) spatio-temporal covariates.
 
-
-First, we will try adding spatial terms. The spatial model adds a smoothed term which is function of the longitude and the latitude. A bivariate function is used because it makes sense to assume that there are more cases at certain locations (defined by the interaction between latitude and longitude) than others, rather than there being more cases at
-locations with a certain longitude for any latitude, or the other way round. Hence, our linear predictor is now
+First, we will try adding spatial terms. The spatial model adds a smoothed term which is a function of the longitude and the latitude. A bivariate function is used as it makes sense to assume that there are more cases at certain locations (defined by the interaction between latitude and longitude) than others, in comparison to there being more cases at
+locations with a certain longitude for any latitude, or vice-versa. Hence, our linear predictor is now
 $$
 log(\lambda_i) = log(z_i) +  \sum_{j=1}^{7}\sum_{k=1}^{q}\beta_{j,k}b_{j,k}(x_{i,j}) + \sum_{k=1}^{q}\beta_{k}b_{k}(lon_i , lat_i) 
 $$
 
-
-Using this model with the regular \texttt{s} smoother function from the \texttt{mgcv} package leads to a model that can explain 56.4\% of the deviance and has a slightly lower AIC of 14,013.13. The QQ plot still points to the upper and lower tails being incorrectly predicted. At the cost of significantly more computation, using a tensor product smooth \texttt{te} on the bivariate spatial term with 20 knots allows us to make a decent improvement on this. See Appendix for different numbers of knots that were tested. This gets us to 69.9\% deviance explained. The QQ plot looks considerably better with only a few problematic instances at the top and bottom quantiles.
+Using this model with the regular \texttt{s} smoother function from the \texttt{mgcv} package leads to a model that can explain 56.4\% of the deviance and has a slightly lower AIC of 14,013.13. The QQ plot still points to the upper and lower tails being incorrectly predicted. At the cost of significantly more computation, using a tensor product smooth \texttt{te} on the bivariate spatial term with 20 knots allows us to make a decent improvement. This gets us to 69.9\% deviance explained. The QQ plot looks considerably better with only a few problematic instances at the top and bottom quantiles (see Figure \ref{fig:spatial_model_2_check}).
 
 We contest this with an extension on the model with only socio-economic covariates, but instead of adding spatial terms, we add the temporal dimension \texttt{Year}. The linear predictor becomes
 $$
 log(\lambda_i) = log(z_i) +  \sum_{j=1}^{7}f_{2012, j}(x_{i,j})\times x_{2012}  + \sum_{j=1}^{7}f_{2013, j}(x_{i,j})\times x_{2013} +  \sum_{j=1}^{7}f_{2014, j}(x_{i,j})\times x_{2014}
 $$
-where the new terms $x_{2012},x_{2013},x_{2014}$ are indicator variables equating to 1 if \texttt{Year} is respectively 2012,2013,2014 and zero otherwise. Exercising some shorthand, it can be expressed as
+where the new terms $x_{2012},\ x_{2013},\ x_{2014}$ are indicator variables equating to 1 if \texttt{Year} is respectively 2012, 2013, 2014 and 0 otherwise. Exercising some shorthand, it can be expressed as
 $$
 log(\lambda_i) = log(z_i) +  \sum_{t=2012}^{2014}\sum_{j=1}^{7}f_{t, j}(x_{i,j})\times x_{t}
 $$
@@ -73,31 +71,27 @@ where $x_t$ is now the indicator variable for \texttt{Year}. A slightly separate
 $$
 log(\lambda_i) = log(z_i) +  \sum_{j=1}^{7}f_{t, j}(x_{i,j}) + \sum_{t=2012}^{2014}\beta_t x_t
 $$
-Neither of the temporal formulations show much increase in deviance explained (the one with year as grouping variable actually shows a decrease to 41.5\%!). Their QQ plots are also much worse than the spatial model, showing gross deviations on high as well as low quantiles. Finally, we create a spatio-temporal model, including both \texttt{Year} as well as \texttt{lon,lat}. Its linear predictor is formulated as below
+Neither of the temporal formulations show much increase in deviance explained. Their QQ plots are also much worse than the spatial model, showing gross deviations on high as well as low quantiles. Finally, we create a spatio-temporal model, including both \texttt{Year} and \texttt{lon} and \texttt{lat}. Its linear predictor is formulated as
 $$
 log(\lambda_i) = log(z_i) +  \sum_{t=2012}^{2014}\left( \sum_{j=1}^{7}\sum_{k=1}^{q}\beta_{t,j,k}b_{t,j,k}(x_{t,i,j}) + \sum_{k=1}^{q}\beta_{t,k}b_{t,k}(lon_{i,t} , lat_{i,t}) \right) \times x_{t}
 $$
 
-
-This is a model which includes the term for the location and estimates a functional relation for
-each year and each explaining variable. The AIC of this model does not drop compared to the spatial model. Reasons for this may be that 3 factors is perhaps not enough granularity to discern any effect from the temporal dimension. Naive estimates would point towards the spread being higher in winter months as TB spreads through inhaling tiny droplets from coughs or sneezes. Having more granular data at the season or month level could bring to light any temporal patterns, if they exist.
+This is a model which includes the term for the location, and estimates a functional relation for
+each year and each explaining variable. The AIC of this model does not drop much when compared to the spatial model (see Table \ref{tab:metrics}). Reasons for this may be that having 3 levels of factors is not enough granularity to discern any effect from the temporal dimension. Naive estimates would point towards the spread being higher in winter months as TB spreads through inhaling tiny droplets from coughs or sneezes. Having more granular data at the season or month level could bring highlight any temporal patterns, if they do exist.
 \newline
 
-So the spatial model (given that it is simpler) is the model we choose to best explain the ratio of TB cases per capita. To recall, it is formulated as 
+So, the spatial model (given that it is simpler) is the model we choose to best explain the ratio of TB cases per capita. To recall, it is formulated as 
 $$
 log(\lambda_i) = log(z_i) +  \sum_{j=1}^{7}\sum_{k=1}^{q}\beta_{j,k}b_{j,k}(x_{i,j}) + \sum_{k=1}^{q}\beta_{k}b_{k}(lon_i , lat_i) 
 $$
 
-
-Considering the fit of the spatial model, it fits well even though the largest residuals are higher
+Considering the spatial model, it fits well even though the largest residuals are higher
 than expected from the model distribution. For districts that have a high number of cases, the predictor does
 not seem as accurate. But the highest residuals do not arise when the ratio of TB cases per capita
-is extraordinarily high, but rather when the absolute number of TB cases is high (see residuals vs. response).
-The variance of the model still seems too low for those values given that there are some predicted values in
+is extraordinarily high, but rather when the absolute number of TB cases is high (see residuals vs response).
+The variance of the model still seems too low for extreme values. There are some predicted values in
 that high segment of response values (absolute number of TB cases) where the prediction for the response
-value is lower than the actual value, and some where the prediction of the actual value is higher than the
-actual value.
-Using this model, we predict the rate of TB per 100,000 inhabitants. See Figure \ref{fig:pred_TB_rate_map}
+is lower than the actual value. Conversely, in the low segment of response values, there are some instances with a higher prediction than the actual value. Using this model, we predict the rate of TB per 100,000 inhabitants. See Figure \ref{fig:pred_TB_rate_map} for a plotted comparison of predicted and actual TB rates.
 
 %\begin{figure}[H]
 %	\centering

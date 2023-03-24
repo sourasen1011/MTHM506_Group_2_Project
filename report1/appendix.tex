@@ -8,26 +8,26 @@
 	\subfloat[\centering Predicted]{{\includegraphics[scale=0.6]{pred_TB_rate_map.jpg} }}%
 	\qquad
 	\subfloat[\centering True]{{\includegraphics[scale=0.6]{true_TB_rate_map.jpg} }}%
-	\caption{Predicted (a) and True (b) rates of TB per 100k inhabitants. North-western parts of the country as well as parts near the south exhibit high TB incidence per capita. These would roughly correspond to the states (\textit{estados}) of Amazonas in the North-West, Sao Paolo in the South and Rio de Janeiro on the South East coast. Refer to state map in Figure \ref{fig:brazil-division-states}}%
+	\caption{Predicted (a) and True (b) rates of TB per 100,000 inhabitants. North-western parts of the country as well as parts near the south exhibit high TB incidence per capita. These would roughly correspond to the states (\textit{estados}) of Amazonas in the north-west, Sao Paolo in the south and Rio de Janeiro on the south-east coast. Refer to state map in Figure \ref{fig:brazil-division-states}.}%
 	\label{fig:pred_TB_rate_map}%
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{model_poisson_check.jpg}
-\caption{\label{fig:model_poisson_check}\texttt{gam.check( )} results for \texttt{model\_poisson}. The data is overdispersed as can be seen from both the QQ-plot and the fanning of the Resids vs linear pred. plot. The histogram of residuals is also quite different from a gaussian distribution}
+\caption{\label{fig:model_poisson_check}\texttt{gam.check( )} results for \texttt{model\_poisson}. The data is overdispersed as can be seen from both the QQ plot and the fanning of the Resids vs linear pred. plot. The histogram of residuals is also quite different from a gaussian distribution.}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{model_nb_2_check.jpg}
-\caption{\label{fig:model_nb_2_check}\texttt{gam.check( )} results for \texttt{model\_nb\_2}. Albeit an improvement of the Poisson model, the model has a tough time correctly predicting values on the upper and lower quantiles}
+\caption{\label{fig:model_nb_2_check}\texttt{gam.check( )} results for \texttt{model\_nb\_2}. Although there is an improvement on the Poisson model, the model has difficulty in correctly predicting values on the upper and lower quantiles.}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{spatial_model_2_check.jpg}
-\caption{\label{fig:spatial_model_2_check}\texttt{gam.check( )} results for \texttt{spatial.model.2}. This is the model that has finally been used as temporal additions on top of this provide very little additional explanatory power}
+\caption{\label{fig:spatial_model_2_check}\texttt{gam.check( )} results for \texttt{spatial.model.2}. This is the model that has finally been used as temporal additions on top of this provide very little additional explanatory power.}
 \end{figure}
 
 
@@ -40,13 +40,13 @@
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.4]{spearman_correl.jpg}
-\caption{\label{fig:spearman_correl}Correlogram shows covariates with highest positive and negative correlations.}
+\caption{\label{fig:spearman_correl}Correlogram shows socio-economic covariates with highest positive and negative correlations.}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{brazil-division-states.jpg}
-\caption{\label{fig:brazil-division-states}State map of Brazil provided for reference.}
+\caption{\label{fig:brazil-division-states}State map of Brazil.}
 \end{figure}
 
 
